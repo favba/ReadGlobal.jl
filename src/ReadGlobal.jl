@@ -36,24 +36,26 @@ function getdimsize()
   return nx,ny,nz,x,y,z
 end
 
-function readpadded!(stream::IO, field::AbstractArray{T,N}) where {T,N}
-  if N == 1
-    read!(stream,field)
-  else
-    dims = size(field)
-    nx = dims[1]
-    nb = sizeof(T)*nx
-    npencils = prod(dims)/nx
-    npad = iseven(nx)? 2 : 1
-    for i=0:(npencils-1)
-      unsafe_read(stream,Ref(field,Int((nx+npad)*i+1)),nb)
+function readpadded!(stream::IO, field::AbstractArray{T,3}) where {T}
+  dim = size(field)
+  nx,ny,nz = dim
+  sb = sizeof(T)
+  npad = iseven(nx) ? 2 : 1
+    for k in 1:nz
+      for j in 1:ny
+        unsafe_read(stream,pointer(field,sub2ind(dim,1,j,k)),nx*sb)
+        skip(stream, npad*sb)
+      end
     end
-  end
   return field
 end
 
-function readpadded!(file::AbstractString, field::AbstractArray)
-  open(file) do io 
+function readpadded!(file::AbstractString, field::AbstractArray{T,N}) where {T,N}
+  open(file) do io
+   dims = size(field)
+   ndim = [dims...]
+   ndim[1] += iseven(ndim[1]) ? 2 : 1
+   filesize(file) !== prod(ndim)*sizeof(T) && error("Dimension Mismatch")
    return readpadded!(io,field) 
   end
 end
