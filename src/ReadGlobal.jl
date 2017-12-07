@@ -116,7 +116,7 @@ end
 function best_nc(ni::Int,no::Int,nx::Int,ny::Int,nz::Int)
   nc::Int = 1
   totalmem::Int = floor(Sys.total_memory())
-  use::Float64 = 0.65
+  use::Float64 = 0.25
   usemem = use*totalmem
   totalfields::Int = (ni+no)*nx*ny*nz*sizeof(Float64)
   if usemem < totalfields
