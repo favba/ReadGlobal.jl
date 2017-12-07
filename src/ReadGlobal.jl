@@ -126,6 +126,7 @@ function best_nc(ni::Int,no::Int,nx::Int,ny::Int,nz::Int)
       newsize /= 2
     end
   end
+  nc == 1 && (nc = 2)
   return nc
 end
 
