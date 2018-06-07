@@ -1,7 +1,7 @@
 __precompile__()
 module ReadGlobal
 
-export readglobal, getdimsize, readpadded, readpadded!, readfield, readfield!, checkinput, getnfilter, doinchunks
+export readglobal, getdimsize, readpadded, readpadded!, readfield, readfield!, checkinput, getnfilter, doinchunks, read_info
 
 function findglobal()
     filename="global"
@@ -120,7 +120,7 @@ end
 function best_nc(ni::Int,no::Int,nx::Int,ny::Int,nz::Int)
     nc::Int = 1
     totalmem::Int = floor(Sys.total_memory())
-    use::Float64 = 0.25
+    use::Float64 = 0.75
     usemem = use*totalmem
     totalfields::Int = (ni+no)*nx*ny*nz*sizeof(Float64)
     if usemem < totalfields
@@ -130,7 +130,6 @@ function best_nc(ni::Int,no::Int,nx::Int,ny::Int,nz::Int)
             newsize /= 2
         end
     end
-    nc == 1 && (nc = 2)
     return nc
 end
 
@@ -174,5 +173,15 @@ function doinchunks(func::Function,nc::Int=0;input::NTuple{Ni,String}=(),output:
 
     return 0
 end
+
+function read_info(stream)
+    med = parse(Float64,readline(stream)[7:end])
+    std = parse(Float64,readline(stream)[5:end])
+    maxv = parse(Float64,split(readline(stream))[2])
+    minv = parse(Float64,split(readline(stream))[2])
+    return med,std,maxv,minv
+end
+
+read_info(stream::AbstractString) = (open(stream) do f; return read_info(f);end)
 
 end # module
