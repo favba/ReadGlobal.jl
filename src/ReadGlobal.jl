@@ -133,7 +133,7 @@ function best_nc(ni::Int,no::Int,nx::Int,ny::Int,nz::Int)
     return nc
 end
 
-function doinchunks(func::Function,nc::Int=0;input::NTuple{Ni,String}=(),output::NTuple{No,String}=()) where {Ni,No}
+function doinchunks(func::Function,nc::Int=0;input::NTuple{Ni,AbstractString}=(),output::NTuple{No,AbstractString}=()) where {Ni,No}
 
     nx, ny, nz, xs, ys, zs = getdimsize()
 
@@ -145,8 +145,8 @@ function doinchunks(func::Function,nc::Int=0;input::NTuple{Ni,String}=(),output:
     assert(mod(nx*ny*nz,nc)==0)
     chunk = Int(nx*ny*nz/nc)
 
-    iarrays = [Array{Float64}((chunk,)) for i=1:Ni]
-    oarrays = [Array{Float64}((chunk,)) for i=1:No]
+    iarrays = [Vector{Float64}((chunk,)) for i=1:Ni]
+    oarrays = [Vector{Float64}((chunk,)) for i=1:No]
 
     for j=1:nc
         for i in 1:Ni
