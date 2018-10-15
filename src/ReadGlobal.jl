@@ -136,45 +136,65 @@ function best_nc(ni::Int,no::Int,nx::Int,ny::Int,nz::Int)
     return nc
 end
 
-function doinchunks(func::Function,nc::Int=0;input::NTuple{Ni,AbstractString}=(),output::NTuple{No,AbstractString}=()) where {Ni,No}
+init(T,L) = T(L...)
+init(::Type{Array{T,N}},L) where {T,N} = Vector{T}(undef,L...)
+
+function doinchunks(func::Function,nc::Int=0;input::NTuple{Ni,Pair}=(),output::NTuple{No,Pair}=()) where {Ni,No}
 
     nx, ny, nz, xs, ys, zs = getdimsize()
 
-    nc == 0 && (nc = best_nc(Ni,No,nx,ny,nz))
+    TNi = sum(length.(getfield.(input,:second)))
+    TNo = sum(length.(getfield.(output,:second)))
 
-    ifiles = [open(i,"r") for i in input]
-    ofiles = [open(i,"w") for i in output]
+    nc == 0 && (nc = best_nc(TNi,TNo,nx,ny,nz))
 
-    assert(mod(nx*ny*nz,nc)==0)
+    ifnames = getfield.(input,:second)
+    ofnames = getfield.(output,:second)
+
+    @assert mod(nx*ny*nz,nc)==0
     chunk = Int(nx*ny*nz/nc)
 
-    iarrays = [Vector{Float64}(undef,(chunk,)) for i=1:Ni]
-    oarrays = [Vector{Float64}(undef,(chunk,)) for i=1:No]
+    iarrays = init.(getfield.(input,:first),chunk) 
+    oarrays = init.(getfield.(output,:first),chunk) 
+
+    calculation(func,nc,iarrays,oarrays,ifnames,ofnames)
+
+    return 0
+end
+
+mywrite(f,v) = write(f,v)
+myread!(f,v) = read!(f,v)
+mywrite(f::Tuple{<:Union{<:IO,<:AbstractString}},v::Array{T,N}) where {T,N} = write(f[1],v)
+myread!(f::Tuple{<:Union{<:IO,<:AbstractString}},v::Array{T,N}) where {T,N} = read!(f[1],v)
+
+function calculation(func::Function,nc,iarrays,oarrays,ifn,ofn)
+
+    ifiles = (x->open.(x,"r")).(ifn)
+    ofiles = (x->open.(x,"w")).(ofn)
 
     for j=1:nc
-        for i in 1:Ni
-            read!(ifiles[i],iarrays[i])
+        for i in Base.OneTo(length(iarrays))
+            myread!(ifiles[i],iarrays[i])
         end
 
         func(iarrays...,oarrays...)
 
-        for i in 1:No
-            write(ofiles[i],oarrays[i])
+        for i in Base.OneTo(length(oarrays))
+            mywrite(ofiles[i],oarrays[i])
         end
 
-        gc()
+        #gc()
 
     end
 
     for file in ifiles
-        close(file)
+        close.(file)
     end
 
     for file in ofiles
-        close(file)
+        close.(file)
     end
 
-    return 0
 end
 
 function read_info(stream)
