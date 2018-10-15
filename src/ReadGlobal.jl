@@ -1,6 +1,8 @@
 __precompile__()
 module ReadGlobal
 
+using DelimitedFiles
+
 export readglobal, getdimsize, readpadded, readpadded!, readfield, readfield!, checkinput, getnfilter, doinchunks, read_info
 
 function findglobal()
@@ -108,7 +110,7 @@ end
 
 function getnfilter()
     place = split(pwd(),"/")
-    if ismatch(r"^Model_",place[end])
+    if occursin(r"^Model_",place[end])
         N = place[end-1][2:end]
         Fil = place[end-2][1]
     else

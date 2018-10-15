@@ -3,6 +3,9 @@ uuid = "858704a1-3b57-5cfa-b7d3-7513df57bf80"
 authors = ["Felipe Alves <favbalves@gmail.com>"]
 version = "0.1.0"
 
+[deps]
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
