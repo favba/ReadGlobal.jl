@@ -1,5 +1,5 @@
 using ReadGlobal
-using Base.Test
+using Test
 
 for t in (Float32,Float64)
   for l in (1,2)

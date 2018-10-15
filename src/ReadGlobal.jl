@@ -41,9 +41,10 @@ function readpadded!(stream::IO, field::AbstractArray{T,3}) where {T}
     nx,ny,nz = dim
     sb = sizeof(T)
     npad = iseven(nx) ? 2 : 1
+    ind = LinearIndices(dim)
     for k in 1:nz
         for j in 1:ny
-            unsafe_read(stream,pointer(field,sub2ind(dim,1,j,k)),nx*sb)
+            unsafe_read(stream,Ref(field,ind[1,j,k]),nx*sb)
             skip(stream, npad*sb)
         end
     end
@@ -61,12 +62,12 @@ function readpadded!(file::AbstractString, field::AbstractArray{T,N}) where {T,N
 end
 
 function readpadded(stream,T::DataType,dims)
-    field = Array{T}(dims)
+    field = Array{T}(undef,dims)
     return readpadded!(stream,field)
 end
 
 function readpadded(stream,dims)
-    field = Array{Float64}(dims)
+    field = Array{Float64}(undef,dims)
     return readpadded!(stream,field)
 end
 
@@ -145,8 +146,8 @@ function doinchunks(func::Function,nc::Int=0;input::NTuple{Ni,AbstractString}=()
     assert(mod(nx*ny*nz,nc)==0)
     chunk = Int(nx*ny*nz/nc)
 
-    iarrays = [Vector{Float64}((chunk,)) for i=1:Ni]
-    oarrays = [Vector{Float64}((chunk,)) for i=1:No]
+    iarrays = [Vector{Float64}(undef,(chunk,)) for i=1:Ni]
+    oarrays = [Vector{Float64}(undef,(chunk,)) for i=1:No]
 
     for j=1:nc
         for i in 1:Ni
