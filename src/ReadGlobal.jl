@@ -137,7 +137,7 @@ function best_nc(ni::Int,no::Int,nx::Int,ny::Int,nz::Int)
 end
 
 init(T,L) = T(L...)
-init(::Type{Array{T,N}},L) where {T,N} = Vector{T}(undef,L...)
+init(::Type{Array{T,N}},L) where {T,N} = Array{T,N}(undef,L...)
 
 function doinchunks(func::Function,nc::Int=0;input::NTuple{Ni,Pair}=(),output::NTuple{No,Pair}=()) where {Ni,No}
 
