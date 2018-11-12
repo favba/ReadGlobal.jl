@@ -95,7 +95,7 @@ end
 
 function readfield(filename::String,nx::Int,ny::Int,nz::Int)
     dtype,padded = checkinput(filename,nx,ny,nz)
-    return padded ? readpadded(filename,dtype,(nx,ny,nz)) : read!(filename,Array{dtype}(nx,ny,nz))
+    return padded ? readpadded(filename,dtype,(nx,ny,nz)) : read!(filename,Array{dtype}(undef,nx,ny,nz))
 end
 
 function readfield(filename::String)
