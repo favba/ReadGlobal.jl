@@ -167,7 +167,7 @@ myread!(f,v) = read!(f,v)
 mywrite(f::Tuple{<:Union{<:IO,<:AbstractString}},v::Array{T,N}) where {T,N} = write(f[1],v)
 myread!(f::Tuple{<:Union{<:IO,<:AbstractString}},v::Array{T,N}) where {T,N} = read!(f[1],v)
 
-function calculation(func::Function,nc,iarrays,oarrays,ifn,ofn)
+function calculation(func::F,nc,iarrays,oarrays,ifn,ofn) where {F<:Function}
 
     ifiles = (x->open.(x,"r")).(ifn)
     ofiles = (x->open.(x,"w")).(ofn)
