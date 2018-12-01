@@ -3,7 +3,7 @@ module ReadGlobal
 
 using DelimitedFiles
 
-export readglobal, getdimsize, readpadded, readpadded!, readfield, readfield!, checkinput, getnfilter, doinchunks, read_info
+export readglobal, getdimsize, readpadded, readpadded!, readfield, readfield!, checkinput, getnfilter, doinchunks, read_info, readcsv
 
 function findglobal()
     filename="global"
@@ -206,5 +206,19 @@ function read_info(stream)
 end
 
 read_info(stream::AbstractString) = (open(stream) do f; return read_info(f);end)
+
+function readcsv(filename::AbstractString)
+    open(filename) do f
+        s = Symbol.(split(readline(f),','))
+        arrs = Vector{Float64}[Vector{Float64}() for i in s]
+        vals = (x->parse.(Float64,x)).(split.(readlines(f),','))
+        for a in vals
+            for i in eachindex(a)
+               push!(arrs[i],a[i])
+            end
+        end
+        return NamedTuple{(s...,)}((arrs...,))
+    end
+end
 
 end # module
