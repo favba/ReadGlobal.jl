@@ -217,8 +217,20 @@ function readcsv(filename::AbstractString)
                push!(arrs[i],a[i])
             end
         end
-        return NamedTuple{(s...,)}((arrs...,))
+        #return NamedTuple{(s...,)}((arrs...,))
+        return FakeNamedTuple(s,arrs)
     end
+end
+
+struct FakeNamedTuple
+    names::Vector{Symbol}
+    data::Vector{Vector{Float64}}
+end
+
+function Base.getproperty(a::FakeNamedTuple,x::Symbol)
+    i = findfirst(y->x==y,getfield(a,:names))
+    i === nothing && return error("Symbol not available")
+    return getfield(a,:data)[i]
 end
 
 end # module
