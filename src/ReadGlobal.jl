@@ -229,7 +229,7 @@ end
 
 function Base.getproperty(a::FakeNamedTuple,x::Symbol)
     i = findfirst(y->x==y,getfield(a,:names))
-    i === nothing && return error("Symbol not available")
+    i === nothing && return error("""No field named "$x" """)
     return getfield(a,:data)[i]
 end
 
