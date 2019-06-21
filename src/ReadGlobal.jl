@@ -3,7 +3,7 @@ module ReadGlobal
 
 using DelimitedFiles
 
-export readglobal, getdimsize, readpadded, readpadded!, readfield, readfield!, checkinput, getnfilter, doinchunks, read_info, readcsv
+export readglobal, getdimsize, readpadded, readpadded!, readfield, readfield!, checkinput, getnfilter, doinchunks, read_info, readcsv, testinput
 
 function findglobal()
     filename="global"
@@ -72,6 +72,23 @@ function readpadded(stream,dims)
     field = Array{Float64}(undef,dims)
     return readpadded!(stream,field)
 end
+
+function testinput(filename::String,nx::Int,ny::Int,nz::Int)
+    sizefile = filesize(filename)
+    if sizefile == (nx+2)*ny*nz*8
+        t = true
+    elseif sizefile == nx*ny*nz*8
+        t = true
+    elseif sizefile == (nx+2)*ny*nz*4
+        t = true
+    elseif sizefile == nx*ny*nz*4
+        t = true
+    else
+        t = false
+    end
+    return t
+end
+
 
 function checkinput(filename::String,nx::Int,ny::Int,nz::Int)
     sizefile = filesize(filename)
