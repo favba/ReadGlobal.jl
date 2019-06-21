@@ -73,7 +73,8 @@ function readpadded(stream,dims)
     return readpadded!(stream,field)
 end
 
-function testinput(filename::String,nx::Int,ny::Int,nz::Int)
+function testinput(filename::String)
+    nx,ny,nz,_,_,_ = getdimsize()
     sizefile = filesize(filename)
     if sizefile == (nx+2)*ny*nz*8
         t = true
